@@ -4,77 +4,29 @@ board = [[0, 0, 0], [0, 0, -1], [-1, 0, 1]]
 
 player = (0, 0)
 
-# def probability(pos, dir):
-#     x, y = pos
-
-#     if dir == "up" and x == 0:
-#         return 0
-#     elif dir == "down" and x == 2:
-#         return 0
-#     elif dir == "left" and y == 0:
-#         return 0
-#     elif dir == "right" and y == 2:
-#         return 0
-#     else:
-#         return 1
-        # if dir == "up":
-        #     x -= 1
-        # elif dir == "down":
-        #     x += 1
-        # if dir == "left":
-        #     y -= 1
-        # elif dir == "right":
-        #     y += 1
-
-
-def reward(pos, dir):
+def reward(pos):
     x, y = pos
-
-    if dir == "up":
-        x -= 1
-    elif dir == "down":
-        x += 1
-    if dir == "left":
-        y -= 1
-    elif dir == "right":
-        y += 1
-
     return board[x][y]
 
-
-def make_move(pos,r_move):
+def make_move(pos, action):
     x,y=pos
-    if r_move=="left":
+    if action=="left":
         y-=1
-        return (x,y),r_move
-    elif r_move=="right":
+        return (x,y)
+    elif action=="right":
         y+=1
-        return (x,y),r_move
-    elif r_move=="up":
+        return (x,y)
+    elif action=="up":
         x-=1
-        return (x,y),r_move
-    elif r_move=="down":
+        return (x,y)
+    elif action=="down":
         x+=1
-        return (x,y),r_move
+        return (x,y)
 
-def possi_moves(pos):
-    x,y=pos
-    mv=["up","down","right","left"]
-    if y==0:
-        mv.remove("left")
-    elif y==2:
-        mv.remove("right")
-    if x==0:
-        mv.remove("up")
-    elif x==2:
-        mv.remove("down")
-    return mv
-    # return list(q_table["dir"][(q_table["x"] == x) & (q_table["y"] == y)])
+def step(state, action):
+    new_state,_ = make_move(state, action)
 
-def step(pos, action):
-    new_pos,_ = make_move(pos, action)
-    rew = reward(pos, action)
-    return new_pos, rew
+    return new_state, reward(new_state)
 
 q_table = pd.DataFrame()
 for i in range(3):
@@ -90,23 +42,7 @@ for i in range(3):
                 continue
             else:
                 row = pd.DataFrame({"x": i, "y": j, "dir": dir,
-                                    "Q": 0, "reward": reward((i,j), dir), "V": 0}, index=[0])
+                                    "Q": 0, "reward": reward((i,j)), "V": 0}, index=[0])
                 q_table = pd.concat([q_table, row])
     q_table.reset_index(drop=True, inplace=True)
 
-print(q_table)
-
-# def main():
-#   pos=(1,2)
-#   A=[]
-#   B=[]
-#   l=possi_moves(pos)
-#   for i in l:
-#     r=reward(pos,i)
-#     A.append(r)
-#     B.append(make_move(pos,i))
-
-#   c=list(zip(A,B))
-#   print(c)
-
-# main()
