@@ -16,10 +16,9 @@ for i in range(3):
             elif action == "right" and j == 2:
                 continue
             else:
-                row = pd.DataFrame({"state": (i, j), "action": action,
-                                    "Q": 0, "reward": reward(make_move((i,j), action)), "value": 0}, index=[0])
+                row = pd.DataFrame({"state": [(i, j)],"action": action, "reward": reward((i, j), action)[1], "value": 0}, index=[0])
                 q_table = pd.concat([q_table, row])
-    q_table.reset_index(drop=True, inplace=True)
+q_table.reset_index(drop=True, inplace=True)
 
 num_episodes = 1000
 

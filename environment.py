@@ -6,9 +6,18 @@ def distance(state, target=(2, 2)):
 
     return ((x2 - x1)**2 + (y2 - y1)**2)**0.5
 
-def reward(state):
-    x, y = state
-    return board[x][y]
+def reward(state, action):
+    new_state = make_move(state, action)
+    x, y = new_state
+    new_reward = board[x][y]
+    if new_reward not in [-10, 10]:
+        # try to give reward based on how close we are to the target
+        old_distance = distance(state)
+        new_distance = distance(new_state)
+        diff = new_distance - old_distance
+        new_reward = -diff
+
+    return new_state, new_reward
 
 def make_move(state, action):
     x, y = state
@@ -26,14 +35,7 @@ def make_move(state, action):
         return (x,y)
 
 def make_step(state, action):
-    new_state = make_move(state, action)
-    new_reward = reward(new_state)
+    new_state, new_reward = reward(state, action)
     done = True if new_reward in [10, -10] else False
-    if not done:
-        # try to give reward based on how close we are to the target
-        old_distance = distance(state)
-        new_distance = distance(new_state)
-        diff = new_distance - old_distance
-        new_reward = -diff
 
     return new_state, new_reward, done
