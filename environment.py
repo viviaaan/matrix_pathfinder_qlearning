@@ -1,6 +1,10 @@
-import pandas as pd
+board = [[1, 1, 1], [1, 1, -10], [-10, 1, 10]]
 
-board = [[0.1, 0.1, 0.1], [0.1, 0.1, -1], [-1, 0.1, 1]]
+def distance(state, target=(2, 2)):
+    x1, y1 = state
+    x2, y2 = target
+
+    return ((x2 - x1)**2 + (y2 - y1)**2)**0.5
 
 def reward(state):
     x, y = state
@@ -20,13 +24,16 @@ def make_move(state, action):
     elif action=="down":
         x+=1
         return (x,y)
-    else:
-        print(action)
-        return action, None
 
 def make_step(state, action):
     new_state = make_move(state, action)
-    rew = reward(new_state)
-    done = True if rew in [1, -1] else False
+    new_reward = reward(new_state)
+    done = True if new_reward in [10, -10] else False
+    if not done:
+        # try to give reward based on how close we are to the target
+        old_distance = distance(state)
+        new_distance = distance(new_state)
+        diff = new_distance - old_distance
+        new_reward = -diff
 
-    return new_state, rew, done
+    return new_state, new_reward, done
