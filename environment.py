@@ -1,4 +1,5 @@
 board = [[1, 1, 1], [1, 1, -10], [-10, 1, 10]]
+start_states = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (2, 1)]
 
 def distance(state, target=(2, 2)):
     x1, y1 = state

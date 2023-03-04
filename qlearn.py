@@ -6,6 +6,8 @@ import pandas as pd
 q_table = pd.DataFrame()
 for i in range(3):
     for j in range(3):
+        if (i, j) not in start_states:
+            continue
         for action in ["up", "down", "left", "right"]:
             if action == "up" and i == 0:
                 continue
@@ -20,7 +22,7 @@ for i in range(3):
                 q_table = pd.concat([q_table, row])
 q_table.reset_index(drop=True, inplace=True)
 
-num_episodes = 1000
+num_episodes = 10000
 
 learning_rate = 0.1
 discount_rate = 0.99
@@ -36,7 +38,7 @@ rewards_all_episodes = []
 # Q-Learning algorithm
 for episode in range(num_episodes):
     print("Episode:", episode)
-    state = (0, 0) # starting state
+    state = random.choice(start_states) # starting state
 
     done = False
     rewards_current_episode = 0
@@ -68,13 +70,13 @@ for episode in range(num_episodes):
     rewards_all_episodes.append(rewards_current_episode)
 
 # Calculate and print the average reward per 100 episodes
-rewards_per_hundred_episodes = np.split(np.array(rewards_all_episodes), num_episodes // 100)
-count = 100
+rewards_per_thousand_episodes = np.split(np.array(rewards_all_episodes), num_episodes // 1000)
+count = 1000
 print("********** Average  reward per hundred episodes **********\n")
 
-for r in rewards_per_hundred_episodes:
-    print(count, ":", sum(r)/100)
-    count += 100
+for r in rewards_per_thousand_episodes:
+    print(count, ":", sum(r)/1000)
+    count += 1000
 
 # Print updated Q-table
 print("\n\n********** Q-table **********\n")
