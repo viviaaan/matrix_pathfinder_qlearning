@@ -1,7 +1,18 @@
-board = [[1, 1, 1], [1, 1, -10], [-10, 1, 10]]
-start_states = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (2, 1)]
+NUM_ROWS = 10
+NUM_COLUMNS = 10
+board = [[0 for _ in range(NUM_COLUMNS)] for _ in range(NUM_ROWS)]
 
-def distance(state, target=(2, 2)):
+start_states = list()
+for x in range(NUM_ROWS):
+    for y in range(NUM_COLUMNS):
+        start_states.append((x, y))
+target = (NUM_ROWS//2, NUM_COLUMNS//2)
+start_states.remove(target)
+target_x, target_y = target
+TARGET_REWARD = 10
+board[target_x][target_y] = TARGET_REWARD
+
+def distance(state, target):
     x1, y1 = state
     x2, y2 = target
 
@@ -11,32 +22,53 @@ def reward(state, action):
     new_state = make_move(state, action)
     x, y = new_state
     new_reward = board[x][y]
-    if new_reward not in [-10, 10]:
+    if new_reward != TARGET_REWARD:
         # try to give reward based on how close we are to the target
-        old_distance = distance(state)
-        new_distance = distance(new_state)
+        old_distance = distance(state, target)
+        new_distance = distance(new_state, target)
         diff = new_distance - old_distance
         new_reward = -diff
 
     return new_state, new_reward
 
+def valid_move(state, action):
+    x, y = state
+    if "upper" in action and x == 0:
+        return False
+    elif "lower" in action and x == NUM_ROWS - 1:
+        return False
+
+    if "left" in action and y == 0:
+        return False
+    if "right" in action and y == NUM_COLUMNS - 1:
+        return False
+    elif action == "up" and x == 0:
+        return False
+    elif action == "down" and x == NUM_ROWS - 1:
+        return False
+
+    return True
+
 def make_move(state, action):
     x, y = state
-    if action=="left":
-        y-=1
-        return (x,y)
-    elif action=="right":
-        y+=1
-        return (x,y)
-    elif action=="up":
+    if "upper" in action:
         x-=1
-        return (x,y)
-    elif action=="down":
+    elif "lower" in action:
         x+=1
-        return (x,y)
+
+    if "left" in action:
+        y-=1
+    elif "right" in action:
+        y+=1
+    elif action == "up":
+        x-=1
+    elif action == "down":
+        x+=1
+
+    return (x,y)
 
 def make_step(state, action):
     new_state, new_reward = reward(state, action)
-    done = True if new_reward in [10, -10] else False
+    game_over = True if new_reward == TARGET_REWARD else False
 
-    return new_state, new_reward, done
+    return new_state, new_reward, game_over
